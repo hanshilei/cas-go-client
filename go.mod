@@ -1,4 +1,4 @@
-module github.com/tmsong/cas-go-client
+module github.com/hanshilei/cas-go-client
 
 go 1.12
 

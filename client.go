@@ -178,16 +178,20 @@ func (c *Client) LogoutUrlForRequest(r *http.Request) (string, error) {
 		return "", err
 	}
 
-	if c.sendService {
-		service, err := requestURL(r)
-		if err != nil {
-			return "", err
-		}
-
-		q := u.Query()
-		q.Add("service", sanitisedURLString(service))
-		u.RawQuery = q.Encode()
+	q := u.Query()
+	jumpTo, err := requestURL(r)
+	if ref := r.Referer(); len(ref) > 0 {
+		jumpTo, err = url.Parse(ref)
 	}
+	if err == nil {
+		q.Add("jumpto", jumpTo.String())
+	}
+	q.Add("appId", fmt.Sprintf("%d", c.appId))
+
+	if c.sendService {
+		q.Add("service", sanitisedURLString(jumpTo))
+	}
+	u.RawQuery = q.Encode()
 
 	return u.String(), nil
 }
